@@ -1,0 +1,117 @@
+<html>
+  <head>
+    <title>Word Scrambler</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kumar+One+Outline&family=Roboto&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    <script src="words.js"></script>
+  </head>
+  <body>
+    <h1>Word Scrambler</h1>
+    <p id="time">Time Left: 0</p>
+    <div class="container">
+      <div class="scoreboard">
+        <h3>Game Over</h3>
+      </div>
+      <div class="app">
+        <p id="word-count">0</p>
+        <p id="word"></p>
+        <p id="cheat"></p>
+        <input type="text" id="input-word">
+        <div class="controls">
+          <button id="scramble-btn">Scramble Again</button>
+          <button id="skip-btn">Next Word</button>
+          <button onclick="restart();">
+            Try Again?!
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      var words = wordsList;
+      var answer, timeout;
+      var timerInterval = setInterval(timer, 1000);
+      var time = 60;
+      var correctWords = 0;
+      $(".scoreboard").hide();
+      
+      function restart() {
+        $(".scoreboard").hide();
+        $("#time").show();
+        timerInterval = setInterval(timer, 1000);
+        $("#word-count").text(correctWords);
+        timeout = setTimeout(timeup, 60000);
+        nextWord(); 
+      }
+      
+      function timeup(){
+        $(".app").hide();
+        $('#time').hide();
+        $(".scoreboard").show();
+        clearInterval(timerInterval);
+      }
+      
+      
+      function timer(){
+        time--;
+        $("#time").text(`Time Left: ${time} secs`)
+      }
+
+      function nextWord() {
+        time = 60;
+        $("#input-word").val("");
+        var length = words.length;
+        var randomNum = Math.floor(Math.random()*length);
+        answer = words[randomNum];
+        console.log(answer);
+        var scrambedWord = scramble(words[randomNum]);
+        $('#word').text(scrambedWord);
+        
+        words.splice(randomNum, 1);
+        clearTimeout(timeout);
+        setTimeout(timeup, 60000);
+      }
+      nextWord();
+
+      function scramble(word) {
+        var mixed = "";
+        var charArray = word.split('');
+        while(charArray.length != 0) {
+          var length = charArray.length;
+          var index = Math.floor(Math.random()*length);
+          mixed = mixed + charArray[index];
+          charArray.splice(index, 1);
+        }
+        return mixed;
+      }
+
+      function scrambleAgain() {
+        var text = $('#word').text();
+        var mixed = scramble(text);
+        $('#word').text(mixed);
+      }
+      $('#scramble-btn').click(scrambleAgain);
+
+      $('#skip-btn').click(nextWord);
+    
+      function checkWord(){
+        var typed = $("#input-word").val();
+        if (typed == answer){
+          correctWords++;
+          $("#wordcount").text(correctWords);
+          nextWord();
+        } else if (answer.includes(typed)) {
+          $('#input-word').removeClass('wrong');
+        } else {
+          $('#input-word').addClass('wrong');
+        }
+      }
+      $('#input-word').keyup(checkWord);
+      
+    </script>
+    
+  </body>
+</html>
+<script type="application/javascript" src="/share.js"></script>
